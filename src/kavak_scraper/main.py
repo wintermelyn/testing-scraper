@@ -1,5 +1,7 @@
 import re
 import json
+import time
+import random
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 from kavak_scraper.models import Car
@@ -115,33 +117,65 @@ def extract_cars_from_text(text: str) -> list[Car]:
 
     return parsed_cars
 
+# -------------------- Manejo de bloqueo --------------------
+
+def robust_scraper_attempt(p, proxy_config, max_retries=3):
+    for attempt in range(1, max_retries + 1):
+        print(f"\n[Intento {attempt}/{max_retries}] usando proxy...")
+        try:
+            browser = p.chromium.launch(
+                headless=True,
+                proxy=proxy_config,
+                args=["--ignore-certificate-errors"]
+            )
+            page = browser.new_page(
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+                extra_http_headers={
+                    "Accept-Language": "es-ES,es;q=0.9",
+                    "Referer": "https://www.google.com/"
+                },
+                viewport={"width": 1280, "height": 800}
+            )
+
+            page.goto("https://www.kavak.com/cl/usados", timeout=100000)
+            page.mouse.wheel(0, 1000)
+            time.sleep(2)
+
+            content = page.content().lower()
+
+            if "request could not be satisfied" in content:
+                print("Página bloqueada, reintentando...")
+                page.screenshot(path=f"bloqueo_intento_{attempt}.png")
+                browser.close()
+                continue
+
+            return page, browser
+
+        except Exception as e:
+            print(f"Error al cargar la página (intento {attempt}):", e)
+
+    raise RuntimeError("No se pudo acceder al sitio tras múltiples intentos.")
+
 # -------------------- Ejecución principal --------------------
 
 def main():
     all_cars = []
 
+    session_id = random.randint(1000, 9999)
     proxy_config = {
         "server": "http://brd.superproxy.io:22225",
-        "username": f"brd-customer-hl_1bde1bb4-zone-residential_proxy1",
+        "username": f"brd-customer-hl_1bde1bb4-zone-residential_proxy1-session-{session_id}",
         "password": "www0ye7kbgs9"
     }
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(
-            headless=False,
-            args=["--ignore-certificate-errors"]
-        )
-        page = browser.new_page(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36")
-
         try:
-            page.goto("https://www.kavak.com/cl/usados", timeout=100000)
-            page.mouse.wheel(0, 500)
+            page, browser = robust_scraper_attempt(p, proxy_config)
+
             total_pages = get_total_pages(page)
             print(f"Total de páginas detectadas: {total_pages}")
         except Exception as e:
-            print("Error al cargar la página principal:", e)
-            page.screenshot(path="error_initial_page.png")
-            browser.close()
+            print("Error crítico:", e)
             return
 
         for page_num in range(1):  # Cambiar por `range(total_pages)` si deseas scrapear todas
