@@ -137,7 +137,7 @@ def main():
 
     with sync_playwright() as p:
         browser = p.chromium.launch(
-            headless=False,
+            headless=True,
             proxy=proxy_config,
             args=["--ignore-certificate-errors"]
             )
@@ -147,7 +147,6 @@ def main():
         page.goto("https://www.kavak.com/cl/usados", timeout=60000)
         total_pages = get_total_pages(page)
         print(f"Total de páginas detectadas: {total_pages}")
-        input("Presiona Enter para continuar...")
 
         for page_num in range(1):
             print(f"Scrapeando página {page_num}...")
