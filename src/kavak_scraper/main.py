@@ -26,18 +26,27 @@ def save_to_json(cars: list[Car], filename: str = "autos.json") -> None:
 # -------------------- Scraping --------------------
 
 def get_total_pages(page) -> int:
-    # Espera a que aparezca la sección de paginación
-    page.wait_for_selector("div.paginator-row", timeout=10000)
+    # Espera a que aparezca la nueva sección de paginación por clase
+    page.wait_for_selector(".results_results__pagination__yZaD_", timeout=10000)
 
-    # Selecciona el span con la clase 'total'
-    total_span = page.query_selector("div.results span.total")
+    # Selecciona el contenedor de paginación
+    pagination = page.query_selector(".results_results__pagination__yZaD_")
 
-    if total_span:
-        text = total_span.inner_text().strip()
-        if text.isdigit():
-            return int(text)
+    if pagination:
+        # Busca todos los elementos que parezcan ser números de página
+        page_links = pagination.query_selector_all("a")
+        numbers = []
 
-    return 1  # Valor por defecto si no se encuentra el total
+        for link in page_links:
+            text = link.inner_text().strip()
+            if text.isdigit():
+                numbers.append(int(text))
+
+        if numbers:
+            return max(numbers)
+
+    return 1  # Valor por defecto si no se encuentra paginación
+
 
 
 
@@ -119,14 +128,26 @@ def extract_cars_from_text(text: str) -> list[Car]:
 def main():
     all_cars = []
 
+    proxy_config = {
+        "server": "http://brd.superproxy.io:33335",
+        "username": "brd-customer-hl_1bde1bb4-zone-residential_proxy1",
+        "password": "www0ye7kbgs9"
+    }
+
+
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        browser = p.chromium.launch(
+            headless=False,
+            proxy=proxy_config,
+            args=["--ignore-certificate-errors"]
+            )
         page = browser.new_page()
 
         # Página inicial para conocer el total
         page.goto("https://www.kavak.com/cl/usados", timeout=60000)
         total_pages = get_total_pages(page)
         print(f"Total de páginas detectadas: {total_pages}")
+        input("Presiona Enter para continuar...")
 
         for page_num in range(1):
             print(f"Scrapeando página {page_num}...")
