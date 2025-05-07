@@ -136,7 +136,7 @@ def main():
 
     proxy_config = {
         "server": "http://brd.superproxy.io:22225",
-        "username": f"brd-customer-hl_1bde1bb4-zone-residential_proxy1-country-cl-session-{session_id}",
+        "username": f"brd-customer-hl_1bde1bb4-zone-residential_proxy1",
         "password": "www0ye7kbgs9"
     }
 
@@ -146,21 +146,11 @@ def main():
             headless=False,
             proxy=proxy_config,
             args=[
-                "--disable-blink-features=AutomationControlled",
-                "--no-sandbox",
-                "--disable-dev-shm-usage",
-                "--disable-gpu",
-                "--window-size=1920,1080",
                 "--ignore-certificate-errors"
             ]
             )
         page = browser.new_page(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/123.0.0.0 Safari/537.36")
-        page.add_init_script("""
-            Object.defineProperty(navigator, 'webdriver', {
-                get: () => false
-            });
-        """)
 
         # Página inicial para conocer el total
         page.goto("https://www.kavak.com/cl/usados", timeout=120000)
