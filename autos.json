@@ -1,5 +1,16 @@
 [
     {
+        "brand": "Hyundai",
+        "model": "Grand i10",
+        "year": 2022,
+        "km": 69000,
+        "version": "1.2 VALUE",
+        "transmission": "Manual",
+        "price_actual": 7431900,
+        "price_original": 7581900,
+        "location": "Metropolitana de Santiago"
+    },
+    {
         "brand": "Kia",
         "model": "RIO 5",
         "year": 2019,
@@ -316,17 +327,6 @@
         "transmission": "Automático",
         "price_actual": 10674900,
         "price_original": 10834900,
-        "location": "Metropolitana de Santiago"
-    },
-    {
-        "brand": "Mazda",
-        "model": "CX-5",
-        "year": 2015,
-        "km": 76000,
-        "version": "2.0 SKYACTIV GT AUTO 4WD",
-        "transmission": "Automático",
-        "price_actual": 10922900,
-        "price_original": 11143900,
         "location": "Metropolitana de Santiago"
     }
 ]

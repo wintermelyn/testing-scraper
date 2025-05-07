@@ -162,10 +162,9 @@ def main():
             print(f"Scrapeando página {page_num}...")
             url = f"https://www.kavak.com/cl/usados?page={page_num}"
             page.goto(url, timeout=120000)
-            content_xpath = "/html/body/div[1]/main/div/div[1]/section/article/div[3]"
-            page.wait_for_selector(f"xpath={content_xpath}", timeout=120000)
-
-            element = page.query_selector(f"xpath={content_xpath}")
+            content_selector = ".results_results__container__tcF4_"
+            page.wait_for_selector(content_selector, timeout=120000)
+            element = page.query_selector(content_selector)
             if element:
                 raw_text = element.inner_text()
                 cars = extract_cars_from_text(raw_text)
