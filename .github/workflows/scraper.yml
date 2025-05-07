@@ -57,3 +57,11 @@ jobs:
       - name: Run scraper
         run: |
           poetry run scrap
+
+      - name: Upload artifacts (screenshots and JSON)
+        uses: actions/upload-artifact@v4
+        with:
+          name: scraper-output
+          path: |
+            *.png
+            autos.json
