@@ -130,9 +130,10 @@ def main():
 
     proxy_config = {
         "server": "http://brd.superproxy.io:33335",
-        "username": "brd-customer-hl_1bde1bb4-zone-residential_proxy1",
+        "username": "brd-customer-hl_1bde1bb4-zone-residential_proxy1-country-cl",
         "password": "www0ye7kbgs9"
     }
+
 
 
     with sync_playwright() as p:
