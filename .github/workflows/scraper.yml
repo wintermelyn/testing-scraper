@@ -61,7 +61,7 @@ jobs:
 
       - name: Install Playwright and its dependencies
         run: |
-          poetry run playwright install --with-deps
+          poetry run playwright install chromium
 
       - name: Run scraper
         run: |
