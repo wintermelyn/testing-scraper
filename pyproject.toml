@@ -12,8 +12,6 @@ requests = "^2.32.3"
 beautifulsoup4 = "^4.13.4"
 pydantic = "^2.11.4"
 playwright = "^1.52.0"
-fastapi = "^0.115.12"
-uvicorn = "^0.34.2"
 
 [tool.poetry.scripts]
 scrap = "kavak_scraper.main:main"
