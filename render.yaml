@@ -2,10 +2,14 @@ services:
   - type: web
     name: kavak-scraper-api
     env: python
+    plan: free
     buildCommand: |
+      curl -sSL https://install.python-poetry.org | python3 -
+      export PATH="$HOME/.local/bin:$PATH"
       poetry install
-    startCommand: ./start.sh
+    startCommand: |
+      export PATH="$HOME/.local/bin:$PATH"
+      poetry run uvicorn api.main:app --host 0.0.0.0 --port 10000
     envVars:
       - key: PYTHON_VERSION
         value: "3.11"
-    plan: free
