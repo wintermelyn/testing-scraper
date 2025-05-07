@@ -1,5 +1,7 @@
 import re
 import json
+import random
+import string
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 from kavak_scraper.models import Car
@@ -13,6 +15,8 @@ def parse_price(text: str) -> int | None:
         return int(digits[0].replace(".", ""))
     return None
 
+def generate_session_id(length=8):
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 
 def save_to_json(cars: list[Car], filename: str = "autos.json") -> None:
     data = [car.model_dump() for car in cars]
@@ -128,24 +132,39 @@ def extract_cars_from_text(text: str) -> list[Car]:
 def main():
     all_cars = []
 
+    session_id = generate_session_id()
+
     proxy_config = {
-        "server": "http://brd.superproxy.io:33335",
-        "username": "brd-customer-hl_1bde1bb4-zone-residential_proxy1-country-cl",
+        "server": "http://brd.superproxy.io:22225",
+        "username": f"brd-customer-hl_1bde1bb4-zone-residential_proxy1-country-cl-session-{session_id}",
         "password": "www0ye7kbgs9"
     }
 
 
-
     with sync_playwright() as p:
         browser = p.chromium.launch(
-            headless=True,
+            headless=False,
             proxy=proxy_config,
-            args=["--ignore-certificate-errors"]
+            args=[
+                "--disable-blink-features=AutomationControlled",
+                "--no-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--window-size=1920,1080",
+                "--ignore-certificate-errors"
+            ]
             )
-        page = browser.new_page()
+        page = browser.new_page(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/123.0.0.0 Safari/537.36")
+        page.add_init_script("""
+            Object.defineProperty(navigator, 'webdriver', {
+                get: () => false
+            });
+        """)
 
         # Página inicial para conocer el total
         page.goto("https://www.kavak.com/cl/usados", timeout=120000)
+        page.mouse.wheel(0, 500)
         total_pages = get_total_pages(page)
         print(f"Total de páginas detectadas: {total_pages}")
 
