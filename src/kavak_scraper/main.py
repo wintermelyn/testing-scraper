@@ -24,7 +24,7 @@ def save_to_json(cars: list[Car], filename: str = "autos.json") -> None:
 
 def get_total_pages(page) -> int:
     try:
-        page.wait_for_selector(".results_results__pagination__yZaD_", timeout=200000)
+        page.wait_for_selector(".results_results__pagination__yZaD_", timeout=100000)
         pagination = page.query_selector(".results_results__pagination__yZaD_")
 
         if pagination:
@@ -134,7 +134,7 @@ def main():
         page = browser.new_page(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36")
 
         try:
-            page.goto("https://www.kavak.com/cl/usados", timeout=200000)
+            page.goto("https://www.kavak.com/cl/usados", timeout=100000)
             page.mouse.wheel(0, 500)
             total_pages = get_total_pages(page)
             print(f"Total de páginas detectadas: {total_pages}")
@@ -150,7 +150,7 @@ def main():
                 url = f"https://www.kavak.com/cl/usados?page={page_num}"
                 page.goto(url, timeout=120000)
                 content_selector = ".results_results__container__tcF4_"
-                page.wait_for_selector(content_selector, timeout=200000)
+                page.wait_for_selector(content_selector, timeout=100000)
 
                 element = page.query_selector(content_selector)
                 if element:
