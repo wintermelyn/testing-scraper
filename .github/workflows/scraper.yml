@@ -18,16 +18,12 @@ jobs:
         with:
           python-version: 3.11
 
-      - name: Configure Poetry to use in-project virtualenv
-        run: poetry config virtualenvs.in-project true
-
-      - name: Cache Poetry dependencies and virtualenv
+      - name: Cache Poetry dependencies
         uses: actions/cache@v3
         with:
           path: |
             ~/.cache/pypoetry
             ~/.cache/pip
-            .venv
           key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
           restore-keys: |
             ${{ runner.os }}-poetry-
@@ -49,10 +45,10 @@ jobs:
           Xvfb :99 &
           echo "DISPLAY=:99" >> $GITHUB_ENV
 
-      - name: Install Poetry and project dependencies
+      - name: Install project dependencies
         run: |
           pip install poetry
-          poetry install --no-interaction --no-ansi
+          poetry install
 
       - name: Install Playwright and its dependencies
         run: |
