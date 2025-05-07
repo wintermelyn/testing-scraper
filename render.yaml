@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: kavak-scraper-api
+    env: python
+    buildCommand: |
+      poetry install
+    startCommand: ./start.sh
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11"
+    plan: free
