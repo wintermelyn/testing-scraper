@@ -1,16 +1,9 @@
 services:
   - type: web
     name: kavak-scraper-api
-    env: python
+    env: docker
     plan: free
-    buildCommand: |
-      curl -sSL https://install.python-poetry.org | python3 -
-      export PATH="$HOME/.local/bin:$PATH"
-      poetry install
-      poetry run playwright install --with-deps
-    startCommand: |
-      export PATH="$HOME/.local/bin:$PATH"
-      poetry run uvicorn api.main:app --host 0.0.0.0 --port 10000
+    dockerfilePath: ./Dockerfile
     envVars:
-      - key: PYTHON_VERSION
-        value: "3.11"
+      - key: PORT
+        value: "10000"
